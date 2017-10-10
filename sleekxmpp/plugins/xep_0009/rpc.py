@@ -54,13 +54,14 @@ class XEP_0009(BasePlugin):
         self.xmpp['xep_0030'].add_feature('jabber:iq:rpc')
         self.xmpp['xep_0030'].add_identity('automation','rpc')
 
-    def make_iq_method_call(self, pto, pmethod, params):
+    def make_iq_method_call(self, pto, pmethod, params = None):
         iq = self.xmpp.makeIqSet()
         iq.attrib['to'] = pto
         iq.attrib['from'] = self.xmpp.boundjid.full
         iq.enable('rpc_query')
         iq['rpc_query']['method_call']['method_name'] = pmethod
-        iq['rpc_query']['method_call']['params'] = params
+        if params is not None:
+            iq['rpc_query']['method_call']['params'] = params
         return iq
 
     def make_iq_method_response(self, pid, pto, params):
