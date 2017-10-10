@@ -1,4 +1,5 @@
 import logging
+import pytz
 from datetime import datetime, timedelta
 
 # Make a call to strptime before starting threads to
@@ -107,12 +108,12 @@ def extract_dates(raw_cert):
     validity = tbs.getComponentByName('validity')
 
     not_before = validity.getComponentByName('notBefore')
-    not_before = str(not_before.getComponent())
-    not_before = datetime.strptime(not_before, '%Y%m%d%H%M%SZ')
+    not_before = not_before.getComponent().asDateTime
+    not_before = not_before.astimezone(pytz.UTC).replace(tzinfo = None)
 
     not_after = validity.getComponentByName('notAfter')
-    not_after = str(not_after.getComponent())
-    not_after = datetime.strptime(not_after, '%Y%m%d%H%M%SZ')
+    not_after = not_after.getComponent().asDateTime
+    not_after = not_after.astimezone(pytz.UTC).replace(tzinfo = None)
 
     return not_before, not_after
 
