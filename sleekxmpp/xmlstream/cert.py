@@ -1,6 +1,5 @@
 import logging
-import pytz
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
 
 # Make a call to strptime before starting threads to
 # prevent thread safety issues.
@@ -31,6 +30,17 @@ log = logging.getLogger(__name__)
 
 class CertificateError(Exception):
     pass
+
+
+class UTC(tzinfo):
+    def utcoffset(self, dt):
+        return timedelta(0)
+    def tzname(self, dt):
+        return "UTC"
+    def dst(self, dt):
+        return timedelta(0)
+
+utc = UTC()
 
 
 def decode_str(data):
@@ -109,11 +119,11 @@ def extract_dates(raw_cert):
 
     not_before = validity.getComponentByName('notBefore')
     not_before = not_before.getComponent().asDateTime
-    not_before = not_before.astimezone(pytz.UTC).replace(tzinfo = None)
+    not_before = not_before.astimezone(utc).replace(tzinfo = None)
 
     not_after = validity.getComponentByName('notAfter')
     not_after = not_after.getComponent().asDateTime
-    not_after = not_after.astimezone(pytz.UTC).replace(tzinfo = None)
+    not_after = not_after.astimezone(utc).replace(tzinfo = None)
 
     return not_before, not_after
 
